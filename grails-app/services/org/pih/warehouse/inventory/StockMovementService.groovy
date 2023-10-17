@@ -749,6 +749,15 @@ class StockMovementService {
             }
             requisitionItems.each { requisitionItem ->
                 StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
+                InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(
+                        stockMovementItem.product,
+                        stockMovementItem.lotNumber,
+                        stockMovementItem.expirationDate,
+                )
+                if (inventoryItem) {
+                    inventoryItem.quantity = productAvailabilityService.getQuantityOnHand(inventoryItem)
+                    stockMovementItem.inventoryItem = inventoryItem
+                }
                 stockMovementItems.add(stockMovementItem)
             }
         } else {
